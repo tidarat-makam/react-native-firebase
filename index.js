@@ -23,12 +23,6 @@ import Button_call from './components/Button_call';
 // import Button from './components/Button';
   
 
-// function storeHighScore(userId, score) {
-//   firebase.database().ref('users/' + userId).set({
-//     highscore: score
-//   });
-// }
-
 class Appplication extends Component {
     
   constructor(props) {
@@ -51,17 +45,7 @@ class Appplication extends Component {
 
     firebase.database().ref('Users/').post({
         email,
-        // fname,
-        // lname
     })
-    // .then((data)=>{
-    //     //success callback
-    //     console.log('data ' , data)
-    // }).catch((error)=>{
-    //     //error callback
-    //     console.log('error ' , error)
-    // })
-
   
   }// end connect fierbase
 
