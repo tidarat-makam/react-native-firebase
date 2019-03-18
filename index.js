@@ -1,12 +1,10 @@
 
 import React, {Component} from 'react';
 import {AppRegistry, Text, View, StyleSheet, Dimensions } from 'react-native'; 
-// import * as firebase from 'firebase';
+
 import { name as AppName } from './app.json';
 
 import * as firebase from 'firebase/app';
-// import '@firebase/auth';
-// import '@firebase/post';
 
 /////////////////////////////////////
 import MapView from 'react-native-maps';
@@ -21,7 +19,7 @@ import Button_cut from './components/Button_cut';
 import Button_dont from './components/Button_dont';
 import Button_call from './components/Button_call';
 // import Button from './components/Button';
-  
+
 
 class Appplication extends Component {
     
@@ -43,19 +41,8 @@ class Appplication extends Component {
 
   firebase.initializeApp(firebaseConfig);
 
-    firebase.database().ref('Users/').post({
-        email,
-    })
   
   }// end connect fierbase
-
-
-
-
-
-    // componentDidMount() {
-    //   this.setState({ marker: Marker })
-    // }
 
     render(){
         return (       
