@@ -4,7 +4,10 @@ import {AppRegistry, Text, View, StyleSheet, Dimensions } from 'react-native';
 
 import { name as AppName } from './app.json';
 
-import * as firebase from 'firebase/app';
+// import * as firebase from 'firebase/app';
+import firebase from '@firebase/app';
+import '@firebase/auth';
+import "@firebase/database";
 
 /////////////////////////////////////
 import MapView from 'react-native-maps';
@@ -36,11 +39,14 @@ class Appplication extends Component {
     apiKey: "AIzaSyDLp4gc90CsSrGeLauVk0H3tVlzdi_465E",
     authDomain: "webtechtct.firebaseapp.com",
     databaseURL: "https://webtechtct.firebaseio.com",
-    storageBucket: "webtechtct.appspot.com"
+    projectId: "webtechtct",
+    storageBucket: "webtechtct.appspot.com",
+    messagingSenderId: "61852358148"
   };
 
   firebase.initializeApp(firebaseConfig);
 
+  console.log(firebase)
   
   }// end connect fierbase
 
