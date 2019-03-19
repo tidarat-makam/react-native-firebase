@@ -27,34 +27,46 @@ import Button_call from './components/Button_call';
 class Appplication extends Component {
     
   constructor(props) {
-        super(props);
-        this.state = {
-          text: '',
-          email: ''
-        };
-      }
+    super(props);
+    this.state = {
+      text: '',
+    };
+  }
+
   // connect fierbase
- componentWillMount() {
-   const firebaseConfig = {
-    apiKey: "AIzaSyDLp4gc90CsSrGeLauVk0H3tVlzdi_465E",
-    authDomain: "webtechtct.firebaseapp.com",
-    databaseURL: "https://webtechtct.firebaseio.com",
-    projectId: "webtechtct",
-    storageBucket: "webtechtct.appspot.com",
-    messagingSenderId: "61852358148"
-  };
+  componentWillMount() {
+    console.log("Hello in componentWillMount");
 
-  firebase.initializeApp(firebaseConfig);
+    const firebaseConfig = {
+      apiKey: "AIzaSyDLp4gc90CsSrGeLauVk0H3tVlzdi_465E",
+      authDomain: "webtechtct.firebaseapp.com",
+      databaseURL: "https://webtechtct.firebaseio.com",
+      projectId: "webtechtct",
+      storageBucket: "webtechtct.appspot.com",
+      messagingSenderId: "61852358148"
+    };
 
-  console.log(firebase)
+    firebase.initializeApp(firebaseConfig);
+
+    //test ref firebase
+    firebase.database().ref('/users/004').set({
+      name: 'Pheng Sengvuthy 004',
+      age: 24
+    }).then(() => {
+      console.log('INSERTED !');
+    }).catch((error) => {
+      console.log("error is null");
+      console.log(error);
+    });
+    // end test
   
   }// end connect fierbase
 
-    render(){
-        return (       
-            <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
-                <View><Head/></View>
-                <View style={{ flexGrow: 0.08 }}>
+  render(){
+    return (       
+      <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
+        <View><Head/></View>
+        <View style={{ flexGrow: 0.08 }}>
                   <MapView
                     style={styles.map}
                     initialRegion={{
@@ -86,7 +98,8 @@ class Appplication extends Component {
                     </View>
                 </View>
 
-              </View> // End Main View
+              </View> 
+              // End Main View
 
         ); 
     } // แสดงผลของ app
