@@ -19,33 +19,46 @@ import Head from './components/Head';
 class Appplication extends Component {
 
   fuction 
-  onBuzzer() {
-    firebase.database().ref('/').update({
-      Buzzer: 1
-    }).then(() => {
-      console.log('INSERTED !');
-    }).catch((error) => {
-      console.log("error is null");
-      console.log(error);
-    });
+    onBuzzer() {
+      firebase.database().ref('/').update({
+        Buzzer: 1
+      }).then(() => {
+        console.log('INSERTED !');
+      }).catch((error) => {
+        console.log("error is null");
+        console.log(error);
+      });
   }
     
   fuction 
-  switchEngine() {
-    firebase.database().ref('/').update({
-      Engine: 0
-    }).then(() => {
-      console.log('INSERTED !');
-    }).catch((error) => {
-      console.log("error is null");
-      console.log(error);
-    });
+    switchEngine() {
+      firebase.database().ref('/').update({
+        Engine: 0
+      }).then(() => {
+        console.log('INSERTED !');
+      }).catch((error) => {
+        console.log("error is null");
+        console.log(error);
+      });
+  }
+
+  fuction 
+    chackLococation() {
+       firebase.database().ref('Location/').once('value', function (snapshot) {
+        console.log(snapshot.val())
+        this.latLocation = snapshot.val().lat 
+        this.longLocation = snapshot.val().long
+        console.log("now latLocation",this.latLocation)
+        console.log("now longLocation",this.longLocation)
+    }); 
   }
 
   constructor(props) {
     super(props);
     this.state = {
       text: '',
+      latLocation: '',
+      longLocation: ''
     };
   }
 
@@ -63,6 +76,14 @@ class Appplication extends Component {
     };
 
     firebase.initializeApp(firebaseConfig);
+  
+    firebase.database().ref('Location/').once('value', function (snapshot) {
+      console.log(snapshot.val())
+      this.latLocation = snapshot.val().lat 
+      this.longLocation = snapshot.val().long
+      console.log("now latLocation",this.latLocation)
+      console.log("now longLocation",this.longLocation)
+  }); 
   
   }// end connect fierbase
 
@@ -92,7 +113,7 @@ class Appplication extends Component {
 
                 <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center'}}>
                   <View style={{ width: (Dimensions.get('window').width)/2, height: 25,flexGrow: 0.2  }}>
-                          <Button onPress={onPressLearnMore}  title="chack location " accessibilityLabel="ตรวจสอบตำแหน่ง"/></View>  
+                          <Button onPress={() => this.chackLococation()}  title="chack location " accessibilityLabel="ตรวจสอบตำแหน่ง"/></View>  
                     <View style={{ flexDirection: 'row', flexGrow: 0.08 }}>
                       <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30 }}>
                           <Button onPress={() => this.onBuzzer()}  title="Turn no Buzzer " accessibilityLabel="้เปิดเสียงสำโพง"/></View>   
@@ -106,6 +127,7 @@ class Appplication extends Component {
                           <Button onPress={onPressLearnMore}  title="Off Alert" accessibilityLabel="ไม่สนใจ"/></View>
                     </View>
                 </View>
+                <Text>{this.setState.latLocation }</Text>
 
               </View> 
               // End Main View
