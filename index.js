@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import {AppRegistry, Text, View, StyleSheet, Dimensions } from 'react-native'; 
+import {AppRegistry, Text, View, StyleSheet, Dimensions, Button, onPressLearnMore } from 'react-native'; 
 
 import { name as AppName } from './app.json';
 
@@ -13,19 +13,35 @@ import "@firebase/database";
 import MapView from 'react-native-maps';
 import { Marker } from 'react-native-maps';
 
-
 ////////////////////////////////////
 import Head from './components/Head';
-import Button_chk from './components/Button_chk';
-import Button_Buzz from './components/Button_Buzz';
-import Button_cut from './components/Button_cut';
-import Button_dont from './components/Button_dont';
-import Button_call from './components/Button_call';
-// import Button from './components/Button';
-
 
 class Appplication extends Component {
+
+  fuction 
+  onBuzzer() {
+    firebase.database().ref('/').update({
+      Buzzer: 1
+    }).then(() => {
+      console.log('INSERTED !');
+    }).catch((error) => {
+      console.log("error is null");
+      console.log(error);
+    });
+  }
     
+  fuction 
+  switchEngine() {
+    firebase.database().ref('/').update({
+      Engine: 0
+    }).then(() => {
+      console.log('INSERTED !');
+    }).catch((error) => {
+      console.log("error is null");
+      console.log(error);
+    });
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -47,18 +63,6 @@ class Appplication extends Component {
     };
 
     firebase.initializeApp(firebaseConfig);
-
-    //test ref firebase
-    firebase.database().ref('/users/004').set({
-      name: 'Pheng Sengvuthy 004',
-      age: 24
-    }).then(() => {
-      console.log('INSERTED !');
-    }).catch((error) => {
-      console.log("error is null");
-      console.log(error);
-    });
-    // end test
   
   }// end connect fierbase
 
@@ -87,14 +91,19 @@ class Appplication extends Component {
                 </View>
 
                 <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center'}}>
-                  <View style={{ width: (Dimensions.get('window').width)/2, height: 25,flexGrow: 0.2  }}><Button_chk/></View>  
+                  <View style={{ width: (Dimensions.get('window').width)/2, height: 25,flexGrow: 0.2  }}>
+                          <Button onPress={onPressLearnMore}  title="chack location " accessibilityLabel="ตรวจสอบตำแหน่ง"/></View>  
                     <View style={{ flexDirection: 'row', flexGrow: 0.08 }}>
-                      <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30 }}><Button_Buzz/></View>   
-                      <View style={{ width: (Dimensions.get('window').width)/3, }}><Button_cut/></View>
+                      <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30 }}>
+                          <Button onPress={() => this.onBuzzer()}  title="Turn no Buzzer " accessibilityLabel="้เปิดเสียงสำโพง"/></View>   
+                      <View style={{ width: (Dimensions.get('window').width)/3, }}>
+                          <Button onPress={() => this.switchEngine()}  title="switch off an engine" accessibilityLabel="ดับเครื่องยนต์"/></View>
                     </View>
                     <View style={{ flexDirection: 'row', }}>
-                      <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30 }}><Button_call/></View>   
-                      <View style={{ width: (Dimensions.get('window').width)/3, }}><Button_dont/></View>
+                      <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30 }}>
+                          <Button onPress={onPressLearnMore}  title="call 1192" accessibilityLabel="โทรแจ้ง 1192"/></View>   
+                      <View style={{ width: (Dimensions.get('window').width)/3, }}>
+                          <Button onPress={onPressLearnMore}  title="Off Alert" accessibilityLabel="ไม่สนใจ"/></View>
                     </View>
                 </View>
 
@@ -117,4 +126,4 @@ const styles = StyleSheet.create({
     height: 15,
     width: 3,
   }
- });
+ }); 
