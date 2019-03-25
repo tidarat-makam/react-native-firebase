@@ -42,26 +42,26 @@ class Appplication extends Component {
       });
   }
 
-  fuction 
-    chackLococation() {
-       firebase.database().ref('Location/').once('value', function (snapshot) {
-        console.log(snapshot.val())
-        this.latLocation = snapshot.val().lat 
-        this.longLocation = snapshot.val().long
-        console.log("now latLocation",this.latLocation)
-        console.log("now longLocation",this.longLocation)
-    }); 
-  }
+  // fuction 
+  //   chackLococation() {
+  //      firebase.database().ref('Location/').once('value', function (snapshot) {
+  //       console.log(snapshot.val())
+  //       this.latLocation = snapshot.val().lat 
+  //       this.longLocation = snapshot.val().long
+  //       console.log("now latLocation",this.latLocation)
+  //       console.log("now longLocation",this.longLocation)
+  //   }); 
+  // }
 
   constructor(props) {
     super(props);
     this.state = {
       text: '',
-      latLocation: '',
-      longLocation: ''
+      latLocation: 0.00,
+      longLocation: 0.00 
     };
   }
-
+  
   // connect fierbase
   componentWillMount() {
     console.log("Hello in componentWillMount");
@@ -79,14 +79,16 @@ class Appplication extends Component {
   
     firebase.database().ref('Location/').once('value', function (snapshot) {
       console.log(snapshot.val())
-      this.latLocation = snapshot.val().lat 
-      this.longLocation = snapshot.val().long
-      console.log("now latLocation",this.latLocation)
-      console.log("now longLocation",this.longLocation)
+
+      this.setState({ 
+        latLocation: snapshot.val().lat,
+        longLocation: snapshot.val().long
+      });
+
   }); 
   
   }// end connect fierbase
-
+ 
   render(){
     return (       
       <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
@@ -95,11 +97,12 @@ class Appplication extends Component {
                   <MapView
                     style={styles.map}
                     initialRegion={{
-                        latitude: 13.8213359,
-                        longitude: 100.5137226,
+                        latitude: this.state.latLocation,
+                        longitude: this.state.longLocation,
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
-                  }}>
+                  }}
+                  >
                     <MapView.Marker
                       coordinate={{
                         latitude: 13.8213359,
