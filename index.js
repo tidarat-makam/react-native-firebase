@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import {AppRegistry, Text, View, StyleSheet, Dimensions, Button, onPressLearnMore } from 'react-native'; 
+import {AppRegistry, Text, View, StyleSheet, Dimensions, Button, onPressLearnMore, Switch } from 'react-native'; 
 
 import { name as AppName } from './app.json';
 
@@ -18,7 +18,6 @@ import Head from './components/Head';
 
 class Appplication extends Component {
 
-  fuction 
     onBuzzer() {
       firebase.database().ref('/').update({
         Buzzer: 1
@@ -30,7 +29,6 @@ class Appplication extends Component {
       });
   }
     
-  fuction 
     switchEngine() {
       firebase.database().ref('/').update({
         Engine: 0
@@ -41,6 +39,8 @@ class Appplication extends Component {
         console.log(error);
       });
   }
+
+  
 
   // fuction 
   //   chackLococation() {
@@ -58,9 +58,16 @@ class Appplication extends Component {
     this.state = {
       text: '',
       latLocation: 0.00,
-      longLocation: 0.00 
+      longLocation: 0.00 ,
+      switchValue:false
     };
   }
+
+ toggleSwitch = (value) => {
+      this.setState({switchValue: value})
+      console.log("Switch");
+   }
+  
   
   // connect fierbase
   componentWillMount() {
@@ -80,10 +87,10 @@ class Appplication extends Component {
     firebase.database().ref('Location/').once('value', function (snapshot) {
       console.log(snapshot.val())
 
-      this.setState({ 
-        latLocation: snapshot.val().lat,
-        longLocation: snapshot.val().long
-      });
+      // this.setState({ 
+      //   latLocation: snapshot.val().lat,
+      //   longLocation: snapshot.val().long
+      // });
 
   }); 
   
@@ -93,13 +100,15 @@ class Appplication extends Component {
   render(){
     return (       
       <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
-        <View><Head/></View>
+        <View>
+          <Head funcClick={this.toggleSwitch} swState={this.state.switchValue}/> 
+        </View>
         <View style={{ flexGrow: 0.08 }}>
                   <MapView
                     style={styles.map}
                     initialRegion={{
-                        latitude: this.state.latLocation,
-                        longitude: this.state.longLocation,
+                        latitude: 13.8213359,
+                        longitude: 100.5137226,
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
                   }}

@@ -1,8 +1,19 @@
 import React, { Component } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, Switch } from 'react-native';
 
-export default class Head extends Component {
-    render() {
+const Head = (props) => {
+
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {
+    //       switchValue:false
+    //     };
+    //   }
+    
+    //  toggleSwitch = (value) => {
+    //     this.setState({switchValue: value})
+    //  }
+ 
         return (
             <View 
                 style={{
@@ -27,7 +38,13 @@ export default class Head extends Component {
                         textShadowRadius: 5 
                     }}
                 >My App</Text>
+                <Switch
+                    style={{marginTop:10}}
+                    onValueChange = {props.funcClick}
+                    value = {props.swState}
+                />
             </View>
         );
     }
-}
+
+export default Head;
