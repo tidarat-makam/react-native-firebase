@@ -2,22 +2,11 @@ import React, { Component } from 'react';
 import { Text, View, Switch } from 'react-native';
 
 const Head = (props) => {
-
-    // constructor(props) {
-    //     super(props);
-    //     this.state = {
-    //       switchValue:false
-    //     };
-    //   }
-    
-    //  toggleSwitch = (value) => {
-    //     this.setState({switchValue: value})
-    //  }
  
         return (
             <View 
                 style={{
-                    backgroundColor: '#1ABC9C',
+                    backgroundColor: '#41cac6',
                     height: 60, 
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -37,9 +26,9 @@ const Head = (props) => {
                         textShadowOffset: { width: -1, height: 1 },
                         textShadowRadius: 5 
                     }}
-                >My App</Text>
+                >CycleTrack</Text>
                 <Switch
-                    style={{marginTop:10}}
+                    style={{ marginTop:10, transform: [{ scaleX: 1.3 }, { scaleY: 1.3 }] }}
                     onValueChange = {props.funcClick}
                     value = {props.swState}
                 />

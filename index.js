@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import {AppRegistry, Text, View, StyleSheet, Dimensions, Button, onPressLearnMore, Switch } from 'react-native'; 
+import {AppRegistry, Text, View, StyleSheet, Dimensions, Button, onPressLearnMore, Linking } from 'react-native'; 
 
 import { name as AppName } from './app.json';
 
@@ -22,7 +22,7 @@ class Appplication extends Component {
       firebase.database().ref('/').update({
         Buzzer: 1
       }).then(() => {
-        console.log('INSERTED !');
+        console.log('Buzzer INSERTED !');
       }).catch((error) => {
         console.log("error is null");
         console.log(error);
@@ -33,39 +33,56 @@ class Appplication extends Component {
       firebase.database().ref('/').update({
         Engine: 0
       }).then(() => {
-        console.log('INSERTED !');
+        console.log('switchEngine INSERTED !');
       }).catch((error) => {
         console.log("error is null");
         console.log(error);
       });
   }
 
-  
-
-  // fuction 
-  //   chackLococation() {
-  //      firebase.database().ref('Location/').once('value', function (snapshot) {
-  //       console.log(snapshot.val())
-  //       this.latLocation = snapshot.val().lat 
-  //       this.longLocation = snapshot.val().long
-  //       console.log("now latLocation",this.latLocation)
-  //       console.log("now longLocation",this.longLocation)
-  //   }); 
-  // }
 
   constructor(props) {
     super(props);
     this.state = {
       text: '',
-      latLocation: 0.00,
-      longLocation: 0.00 ,
-      switchValue:false
+      region: {
+        latitude: 37.78825,
+        longitude: -122.4324,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      },
+      switchValue:false,
+      LocationFirst: {
+        latLocation: 0.00,
+        longLocation: 0.00
+      }
+      
     };
   }
 
  toggleSwitch = (value) => {
       this.setState({switchValue: value})
       console.log("Switch");
+     
+      firebase.database().ref('Location/').once('value', function (snapshot) {
+        console.log("LocationTrack: ",snapshot.val())
+        
+        this.setState({
+          LocationFirst: {
+            latLocation: snapshot.val().lat,
+            longLocation: snapshot.val().long
+          }
+        });
+  
+      }.bind(this)); 
+   }
+
+   call() {
+    Linking.openURL(`tel:${1192}`)
+   }
+
+   chang() {
+    console.log(this.state.LocationFirst)
    }
   
   
@@ -74,25 +91,38 @@ class Appplication extends Component {
     console.log("Hello in componentWillMount");
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDLp4gc90CsSrGeLauVk0H3tVlzdi_465E",
-      authDomain: "webtechtct.firebaseapp.com",
-      databaseURL: "https://webtechtct.firebaseio.com",
-      projectId: "webtechtct",
-      storageBucket: "webtechtct.appspot.com",
-      messagingSenderId: "61852358148"
+    apiKey: "AIzaSyBeOrf_e8MWHGufnwmtcI52Wzo3Ds19H2I",
+    authDomain: "testprojecttct2ra.firebaseapp.com",
+    databaseURL: "https://testprojecttct2ra.firebaseio.com",
+    projectId: "testprojecttct2ra",
+    storageBucket: "testprojecttct2ra.appspot.com",
+    messagingSenderId: "188951092399"
+      // apiKey: "AIzaSyDLp4gc90CsSrGeLauVk0H3tVlzdi_465E",
+      // authDomain: "webtechtct.firebaseapp.com",
+      // databaseURL: "https://webtechtct.firebaseio.com",
+      // projectId: "webtechtct",
+      // storageBucket: "webtechtct.appspot.com",
+      // messagingSenderId: "61852358148"
     };
 
     firebase.initializeApp(firebaseConfig);
-  
-    firebase.database().ref('Location/').once('value', function (snapshot) {
-      console.log(snapshot.val())
+    
+    console.log(firebase)
+    console.log("connected firebase!!!")
 
-      // this.setState({ 
-      //   latLocation: snapshot.val().lat,
-      //   longLocation: snapshot.val().long
-      // });
+    firebase.database().ref('Location/').on('value', function (snapshot) {
+      console.log("Location : ",snapshot.val())
+      
+      this.setState({
+        region: {
+          latitude: snapshot.val().lat,
+          longitude: snapshot.val().long,
+          latitudeDelta: 0.0022,
+          longitudeDelta: 0.0001
+        }
+      });
 
-  }); 
+    }.bind(this)); 
   
   }// end connect fierbase
  
@@ -103,21 +133,13 @@ class Appplication extends Component {
         <View>
           <Head funcClick={this.toggleSwitch} swState={this.state.switchValue}/> 
         </View>
-        <View style={{ flexGrow: 0.08 }}>
+        <View style={{ flexGrow: 0.08, marginBottom:10 }}>
                   <MapView
                     style={styles.map}
-                    initialRegion={{
-                        latitude: 13.8213359,
-                        longitude: 100.5137226,
-                        latitudeDelta: 0.0922,
-                        longitudeDelta: 0.0421,
-                  }}
+                    region={this.state.region}
                   >
                     <MapView.Marker
-                      coordinate={{
-                        latitude: 13.8213359,
-                        longitude: 100.5137226
-                      }}
+                      coordinate={this.state.region}
                       title={'รถของคุณอยู่ที่นี้!!'}
                       // description={'marker.description'}
                     />
@@ -125,22 +147,22 @@ class Appplication extends Component {
                 </View>
 
                 <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center'}}>
-                  <View style={{ width: (Dimensions.get('window').width)/2, height: 25,flexGrow: 0.2  }}>
-                          <Button onPress={() => this.chackLococation()}  title="chack location " accessibilityLabel="ตรวจสอบตำแหน่ง"/></View>  
-                    <View style={{ flexDirection: 'row', flexGrow: 0.08 }}>
-                      <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30 }}>
-                          <Button onPress={() => this.onBuzzer()}  title="Turn no Buzzer " accessibilityLabel="้เปิดเสียงสำโพง"/></View>   
+                  {/* <View style={{ width: (Dimensions.get('window').width)/2, height: 25,flexGrow: 0.2  }}>
+                          <Button onPress={() => this.chackLococation()}  title="chack location " accessibilityLabel="ตรวจสอบตำแหน่ง"/></View>   */}
+                    <View style={{ flexDirection: 'row', flexGrow: 0.08, }}>
+                      <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30, marginBottom: 10 }}>
+                          <Button color='#4ca2d0' onPress={() => this.onBuzzer()}  title="Buzzer " accessibilityLabel="้เปิดเสียงสำโพง"/></View>   
                       <View style={{ width: (Dimensions.get('window').width)/3, }}>
-                          <Button onPress={() => this.switchEngine()}  title="switch off an engine" accessibilityLabel="ดับเครื่องยนต์"/></View>
+                          <Button color='#4ca2d0' onPress={() => this.switchEngine()}  title="Engine" accessibilityLabel="ดับเครื่องยนต์"/></View>
                     </View>
                     <View style={{ flexDirection: 'row', }}>
                       <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30 }}>
-                          <Button onPress={onPressLearnMore}  title="call 1192" accessibilityLabel="โทรแจ้ง 1192"/></View>   
+                          <Button color='#4ca2d0' onPress={ () => this.call()}  title="call 1192" accessibilityLabel="โทรแจ้ง 1192"/></View>   
                       <View style={{ width: (Dimensions.get('window').width)/3, }}>
-                          <Button onPress={onPressLearnMore}  title="Off Alert" accessibilityLabel="ไม่สนใจ"/></View>
+                          <Button color='#4ca2d0' onPress={onPressLearnMore}  title="Off Alert" accessibilityLabel="ไม่สนใจ"/></View>
                     </View>
                 </View>
-                <Text>{this.setState.latLocation }</Text>
+                {/* <Button title="test" onPress={() => this.chang()}/> */}
 
               </View> 
               // End Main View
@@ -154,11 +176,8 @@ AppRegistry.registerComponent(AppName, ()=> Appplication);
 const styles = StyleSheet.create({ 
   map: {
     //flex : 1,
-    height: (Dimensions.get('window').width)*1.2,
+    height: (Dimensions.get('window').height)/1.3,
     width: Dimensions.get('window').width,
   },
-  btn1: {
-    height: 15,
-    width: 3,
-  }
+
  }); 
