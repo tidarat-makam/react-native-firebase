@@ -19,10 +19,10 @@ import Head from './components/Head';
 class Appplication extends Component {
 
     onBuzzer() {
-      firebase.database().ref('/').update({
-        Buzzer: 1
+      firebase.database().ref('Device1/').update({
+        StatusAlarm: 1
       }).then(() => {
-        console.log('Buzzer INSERTED !');
+        console.log('Buzzer 1 !');
       }).catch((error) => {
         console.log("error is null");
         console.log(error);
@@ -30,10 +30,10 @@ class Appplication extends Component {
   }
     
     switchEngine() {
-      firebase.database().ref('/').update({
-        Engine: 0
+      firebase.database().ref('Device1/').update({
+        StatusMotor: 0
       }).then(() => {
-        console.log('switchEngine INSERTED !');
+        console.log('switchEngine 0 !');
       }).catch((error) => {
         console.log("error is null");
         console.log(error);
@@ -53,9 +53,11 @@ class Appplication extends Component {
       },
       switchValue:false,
       LocationFirst: {
-        latLocation: 0.00,
-        longLocation: 0.00
-      }
+        latLocation: 37.78825,
+        longLocation: -122.4324
+      },
+      statusSwitch: 0, 
+      Distance: 0
       
     };
   }
@@ -63,16 +65,17 @@ class Appplication extends Component {
  toggleSwitch = (value) => {
       this.setState({switchValue: value})
       console.log("Switch");
-     
-      firebase.database().ref('Location/').once('value', function (snapshot) {
+
+     this.setState({statusSwitch: 1})
+      firebase.database().ref('Device1/Location/').once('value', function (snapshot) {
         console.log("LocationTrack: ",snapshot.val())
         
-        this.setState({
-          LocationFirst: {
-            latLocation: snapshot.val().lat,
-            longLocation: snapshot.val().long
-          }
-        });
+        // this.setState({
+        //   LocationFirst: {
+        //     latLocation: snapshot.val().lat,
+        //     longLocation: snapshot.val().long
+        //   }
+        // });
   
       }.bind(this)); 
    }
@@ -81,10 +84,29 @@ class Appplication extends Component {
     Linking.openURL(`tel:${1192}`)
    }
 
-   chang() {
-    console.log(this.state.LocationFirst)
-   }
+   getDistance() {
+     const R = 6517219
+     const dLat = this.radius(this.state.LocationFirst.latLocation - this.state.region.latitude)
+     const dLong = this.radius(this.state.LocationFirst.longLocation - this.state.region.longitude)
+     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(this.radius(this.state.region.latitude)) * Math.cos(this.radius(this.state.LocationFirst.latLocation)) * Math.sin(dLong / 2) * Math.sin(dLong / 2)
+     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+     const dis = R*c
+    
+     this.setState(
+       {Distance: dis}
+       )
+       console.log("Distance", this.state.Distance)
+    }
+    
+  radius(x) {
+      return x * 22 / 7 / 180
+  }
   
+  chang() {
+    // console.log("LocationTrack: ",this.state.LocationFirst)
+    // console.log("statusSwitch",this.state.statusSwitch)
+    console.log("Distance", this.state.Distance)
+   }
   
   // connect fierbase
   componentWillMount() {
@@ -97,12 +119,6 @@ class Appplication extends Component {
     projectId: "testprojecttct2ra",
     storageBucket: "testprojecttct2ra.appspot.com",
     messagingSenderId: "188951092399"
-      // apiKey: "AIzaSyDLp4gc90CsSrGeLauVk0H3tVlzdi_465E",
-      // authDomain: "webtechtct.firebaseapp.com",
-      // databaseURL: "https://webtechtct.firebaseio.com",
-      // projectId: "webtechtct",
-      // storageBucket: "webtechtct.appspot.com",
-      // messagingSenderId: "61852358148"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -110,7 +126,7 @@ class Appplication extends Component {
     console.log(firebase)
     console.log("connected firebase!!!")
 
-    firebase.database().ref('Location/').on('value', function (snapshot) {
+    firebase.database().ref('Device1/Location/').on('value', function (snapshot) {
       console.log("Location : ",snapshot.val())
       
       this.setState({
@@ -162,7 +178,7 @@ class Appplication extends Component {
                           <Button color='#4ca2d0' onPress={onPressLearnMore}  title="Off Alert" accessibilityLabel="ไม่สนใจ"/></View>
                     </View>
                 </View>
-                {/* <Button title="test" onPress={() => this.chang()}/> */}
+                <Button title="test" onPress={() => this.getDistance()}/>
 
               </View> 
               // End Main View
