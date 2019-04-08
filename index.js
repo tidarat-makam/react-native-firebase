@@ -17,56 +17,84 @@ import { Marker } from 'react-native-maps';
 import Head from './components/Head';
 
 import { Provider } from 'react-redux'
-import {createStore} from 'redux';
+import {createStore, combineReducers} from 'redux';
 
 // BackgroundJob
 import BackgroundJob from 'react-native-background-job';
 
-const initialState = {
+const locaState = {
   LocationFirst: {
-    latLocation: 37.78825,
-    longLocation: -122.4324
+    latLocation: 0.0000,
+    longLocation: 0.000
   },
-  statusSwitch: 0, 
 }
-const reducer = (state = initialState) => {
+// Reducer
+const swReducer = (state = {statusSwitch: 0}, action) => {
+  switch (action.type) {
+    case "SET_SWTCH":
+      state={
+        statusSwitch: state.statusSwitch = action.count,     
+      }
+      break;
+  }
   return state
 }
+const store = createStore(swReducer)
 
-const store = createStore(reducer)
-
-const regularJobKey = "regularJobKey";
-const exactJobKey = "exactJobKey";
-
-
+const locationReducer = (state = locaState, action) => {
+  switch (action.type) {
+    case "SET_LOCATION":
+      state={
+        LocationFirst: {
+          latLocation: action.payloadLat,
+          longLocation: action.payloadLong
+        },    
+      }
+      break; 
+  }
+  return state
+}
+const storeLoca = createStore(locationReducer)
 
 const backgroundJob = {
-  jobKey: exactJobKey,
+  jobKey: "exactJobKey",
   job: () => {
-    console.log("Run BackgroundJob")
-
-    console.log(store.getState())
-    // firebase.database().ref('Device1/Location/').on ('value', function (snapshot) {
-    //   console.log("Location : ",snapshot.val())
-      
-    // }.bind(this));
+     const sSW = JSON.parse(JSON.stringify(store.getState())).statusSwitch;
+    
+    //  console.log(long1) 
+    if(sSW == 1){
+      console.log("Run Background job")
+      firebase.database().ref('Device1/Location/').on ('value', function (snapshot) {
+        // console.log("Location : ",snapshot.val())
+        lat2 = snapshot.val().lat
+        long2 = snapshot.val().long
+      }.bind(this));
+    }else{
+      BackgroundJob.cancelAll();
+    }
+    const lat1 = JSON.parse(JSON.stringify(storeLoca.getState())).LocationFirst.latLocation;
+    const long1 = JSON.parse(JSON.stringify(storeLoca.getState())).LocationFirst.longLocation; 
+    // Distance Map
+    const R = 6517219
+    const dLat = radius(lat1 - lat2)
+    const dLong = radius(long1 - long2)
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(radius(lat2)) * Math.cos(radius(lat1)) * Math.sin(dLong / 2) * Math.sin(dLong / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    const dis = R*c
+// Check Distance Notification
+    if(dis > 15){
+      console.log("sos")
+      alert("title", "message")
+    }
   }
 };
 
 BackgroundJob.register(backgroundJob);
-// const backgroundJob = {
-//   jobKey: "regularJobKey",
-//   period: 1000,
-//   exact: true,
-//   job: () => {
-//     console.log("Run BackgroundJob!!!!")
-//     // firebase.database().ref('Device1/Location/').on('value', function (snapshot) {
-//     //   console.log("Location : ",snapshot.val())
-      
-//     // }.bind(this));
+// radius distance
+function radius(x)  {
+  return  x * 22 / 7 / 180
+}
 
-//   }
-// };
 class Appplication extends Component {
 
   constructor(props) {
@@ -79,26 +107,18 @@ class Appplication extends Component {
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       },
-      switchValue:false,
-      LocationFirst: {
-        latLocation: 37.78825,
-        longLocation: -122.4324
-      },
-      statusSwitch: 0, 
-      Distance: 0,
-      num: 0
-      
+      switchValue: false   
     };
   }
   componentDidMount() {
     BackgroundJob.schedule({
-      jobKey: exactJobKey,
+      jobKey: "exactJobKey",
       period: 1000,
       timeout: 10000,
       exact: true
-    });
-    
+    });  
   }
+
   // connect fierbase
   componentWillMount() {
     console.log("Hello in componentWillMount");
@@ -111,16 +131,12 @@ class Appplication extends Component {
     storageBucket: "testprojecttct2ra.appspot.com",
     messagingSenderId: "188951092399"
     };
-
     // firebase.initializeApp(firebaseConfig);
-
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
-  }
-    
+  }  
     // console.log(firebase)
     console.log("connected firebase!!!")
-
     firebase.database().ref('Device1/Location/').on('value', function (snapshot) {
       console.log("Location : ",snapshot.val())
       this.setState({
@@ -132,10 +148,14 @@ class Appplication extends Component {
         }
       });
     }.bind(this)); 
+    // Check Switch
+    if((JSON.parse(JSON.stringify(store.getState())).statusSwitch) == 1) {
+      this.setState({switchValue: true})
+    }else{
+      this.setState({switchValue: false})
+    } 
+  }
   
-  }// end connect fierbase
-  
-
     onBuzzer() {
       firebase.database().ref('Device1/').update({
         StatusAlarm: 1
@@ -160,42 +180,40 @@ class Appplication extends Component {
 
  toggleSwitch = (value) => {
       this.setState({switchValue: value})
-      console.log("Switch");
-
-     this.setState({statusSwitch: 1})
-      firebase.database().ref('Device1/Location/').once('value', function (snapshot) {
+      // console.log("Switch");
+      // console.log("chkSW" + chkSW);
+      if((JSON.parse(JSON.stringify(store.getState())).statusSwitch) == 0){
+        store.dispatch({
+                type: "SET_SWTCH",
+                count: 1
+              })
+        firebase.database().ref('Device1/Location/').once('value', function (snapshot) {
         console.log("LocationTrack: ",snapshot.val())
-        this.setState({
-          LocationFirst: {
-            latLocation: snapshot.val().lat,
-            longLocation: snapshot.val().long
-          }
-        });
-      }.bind(this)); 
+          storeLoca.dispatch({
+            type: "SET_LOCATION",
+            payloadLat: snapshot.val().lat,
+            payloadLong: snapshot.val().long
+          })
+         }.bind(this));       
+      }else{
+        store.dispatch({
+          type: "SET_SWTCH",
+          count: 0
+        })
+        storeLoca.dispatch({
+          type: "SET_LOCATION",
+          payloadLat: 0,
+          payloadLong: 0
+        })
+      }     
+      console.log(store.getState())
+      console.log(storeLoca.getState())
    }
 
    call() {
     Linking.openURL(`tel:${1192}`)
    }
-
-   getDistance() {
-     const R = 6517219
-     const dLat = this.radius(this.state.LocationFirst.latLocation - this.state.region.latitude)
-     const dLong = this.radius(this.state.LocationFirst.longLocation - this.state.region.longitude)
-     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(this.radius(this.state.region.latitude)) * Math.cos(this.radius(this.state.LocationFirst.latLocation)) * Math.sin(dLong / 2) * Math.sin(dLong / 2)
-     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-     const dis = R*c
-    
-     this.setState(
-       {Distance: dis}
-       )
-       console.log("Distance", this.state.Distance)
-    }
-    
-  radius(x) {
-      return x * 22 / 7 / 180
-  }
-  
+ 
   chang() {
     // console.log("LocationTrack: ",this.state.LocationFirst)
     // console.log("statusSwitch",this.state.statusSwitch)
@@ -237,32 +255,13 @@ class Appplication extends Component {
                           <Button color='#4ca2d0' onPress={onPressLearnMore}  title="Off Alert" accessibilityLabel="ไม่สนใจ"/></View>
                     </View>
                 </View>
-                
-                <Button title="test" onPress={() => this.getDistance()}/>
-
-                {/* <TouchableHighlight
-                  style={styles.button}
-                  onPress={() => {
-                    BackgroundJob.schedule({
-                      jobKey: regularJobKey,
-                      notificationTitle: "Notification title",
-                      notificationText: "Notification text",
-                      period: 1000
-                    });
-                  }}
-                >
-                  <Text>Schedule regular job</Text>
-                </TouchableHighlight> */}
-
               </View> 
               // End Main View
-
         ); 
     } // แสดงผลของ app
 }
 
 AppRegistry.registerComponent(AppName, ()=> Appplication);
-
 
 const styles = StyleSheet.create({ 
   map: {
@@ -271,4 +270,4 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
   },
 
- }); 
+}); 
