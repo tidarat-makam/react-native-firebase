@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import {AppRegistry, Text, View, StyleSheet, Dimensions, Button, onPressLearnMore, Linking } from 'react-native'; 
+import {AppRegistry, Text, View, StyleSheet, Dimensions, Button, onPressLearnMore, Linking, TouchableHighlight } from 'react-native'; 
 
 import { name as AppName } from './app.json';
 
@@ -16,7 +16,125 @@ import { Marker } from 'react-native-maps';
 ////////////////////////////////////
 import Head from './components/Head';
 
+import { Provider } from 'react-redux'
+import {createStore} from 'redux';
+
+// BackgroundJob
+import BackgroundJob from 'react-native-background-job';
+
+const initialState = {
+  LocationFirst: {
+    latLocation: 37.78825,
+    longLocation: -122.4324
+  },
+  statusSwitch: 0, 
+}
+const reducer = (state = initialState) => {
+  return state
+}
+
+const store = createStore(reducer)
+
+const regularJobKey = "regularJobKey";
+const exactJobKey = "exactJobKey";
+
+// const backgroundJob = {
+//   jobKey: "regularJobKey",
+//   period: 1000,
+//   exact: true,
+//   job: () => {
+//     console.log("Run BackgroundJob!!!!")
+//     // firebase.database().ref('Device1/Location/').on('value', function (snapshot) {
+//     //   console.log("Location : ",snapshot.val())
+      
+//     // }.bind(this));
+
+//   }
+// };
+
+const backgroundJob = {
+  jobKey: exactJobKey,
+  job: () => {
+    console.log("Run BackgroundJob")
+
+    console.log(store.getState(LocationFirst))
+    // firebase.database().ref('Device1/Location/').on ('value', function (snapshot) {
+    //   console.log("Location : ",snapshot.val())
+      
+    // }.bind(this));
+  }
+};
+
+BackgroundJob.register(backgroundJob);
+
 class Appplication extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: '',
+      region: {
+        latitude: 37.78825,
+        longitude: -122.4324,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      },
+      switchValue:false,
+      LocationFirst: {
+        latLocation: 37.78825,
+        longLocation: -122.4324
+      },
+      statusSwitch: 0, 
+      Distance: 0,
+      num: 0
+      
+    };
+  }
+  componentDidMount() {
+    BackgroundJob.schedule({
+      jobKey: exactJobKey,
+      period: 1000,
+      timeout: 10000,
+      exact: true
+    });
+    
+  }
+  // connect fierbase
+  componentWillMount() {
+    console.log("Hello in componentWillMount");
+
+    const firebaseConfig = {
+    apiKey: "AIzaSyBeOrf_e8MWHGufnwmtcI52Wzo3Ds19H2I",
+    authDomain: "testprojecttct2ra.firebaseapp.com",
+    databaseURL: "https://testprojecttct2ra.firebaseio.com",
+    projectId: "testprojecttct2ra",
+    storageBucket: "testprojecttct2ra.appspot.com",
+    messagingSenderId: "188951092399"
+    };
+
+    // firebase.initializeApp(firebaseConfig);
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+  }
+    
+    // console.log(firebase)
+    console.log("connected firebase!!!")
+
+    firebase.database().ref('Device1/Location/').on('value', function (snapshot) {
+      console.log("Location : ",snapshot.val())
+      this.setState({
+        region: {
+          latitude: snapshot.val().lat,
+          longitude: snapshot.val().long,
+          latitudeDelta: 0.0022,
+          longitudeDelta: 0.0001
+        }
+      });
+    }.bind(this)); 
+  
+  }// end connect fierbase
+  
 
     onBuzzer() {
       firebase.database().ref('Device1/').update({
@@ -40,28 +158,6 @@ class Appplication extends Component {
       });
   }
 
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      text: '',
-      region: {
-        latitude: 37.78825,
-        longitude: -122.4324,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      },
-      switchValue:false,
-      LocationFirst: {
-        latLocation: 37.78825,
-        longLocation: -122.4324
-      },
-      statusSwitch: 0, 
-      Distance: 0
-      
-    };
-  }
-
  toggleSwitch = (value) => {
       this.setState({switchValue: value})
       console.log("Switch");
@@ -69,14 +165,12 @@ class Appplication extends Component {
      this.setState({statusSwitch: 1})
       firebase.database().ref('Device1/Location/').once('value', function (snapshot) {
         console.log("LocationTrack: ",snapshot.val())
-        
-        // this.setState({
-        //   LocationFirst: {
-        //     latLocation: snapshot.val().lat,
-        //     longLocation: snapshot.val().long
-        //   }
-        // });
-  
+        this.setState({
+          LocationFirst: {
+            latLocation: snapshot.val().lat,
+            longLocation: snapshot.val().long
+          }
+        });
       }.bind(this)); 
    }
 
@@ -107,42 +201,7 @@ class Appplication extends Component {
     // console.log("statusSwitch",this.state.statusSwitch)
     console.log("Distance", this.state.Distance)
    }
-  
-  // connect fierbase
-  componentWillMount() {
-    console.log("Hello in componentWillMount");
 
-    const firebaseConfig = {
-    apiKey: "AIzaSyBeOrf_e8MWHGufnwmtcI52Wzo3Ds19H2I",
-    authDomain: "testprojecttct2ra.firebaseapp.com",
-    databaseURL: "https://testprojecttct2ra.firebaseio.com",
-    projectId: "testprojecttct2ra",
-    storageBucket: "testprojecttct2ra.appspot.com",
-    messagingSenderId: "188951092399"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    
-    console.log(firebase)
-    console.log("connected firebase!!!")
-
-    firebase.database().ref('Device1/Location/').on('value', function (snapshot) {
-      console.log("Location : ",snapshot.val())
-      
-      this.setState({
-        region: {
-          latitude: snapshot.val().lat,
-          longitude: snapshot.val().long,
-          latitudeDelta: 0.0022,
-          longitudeDelta: 0.0001
-        }
-      });
-
-    }.bind(this)); 
-  
-  }// end connect fierbase
- 
-  
   render(){
     return (       
       <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
@@ -178,7 +237,22 @@ class Appplication extends Component {
                           <Button color='#4ca2d0' onPress={onPressLearnMore}  title="Off Alert" accessibilityLabel="ไม่สนใจ"/></View>
                     </View>
                 </View>
+                
                 <Button title="test" onPress={() => this.getDistance()}/>
+
+                {/* <TouchableHighlight
+                  style={styles.button}
+                  onPress={() => {
+                    BackgroundJob.schedule({
+                      jobKey: regularJobKey,
+                      notificationTitle: "Notification title",
+                      notificationText: "Notification text",
+                      period: 1000
+                    });
+                  }}
+                >
+                  <Text>Schedule regular job</Text>
+                </TouchableHighlight> */}
 
               </View> 
               // End Main View
@@ -188,6 +262,7 @@ class Appplication extends Component {
 }
 
 AppRegistry.registerComponent(AppName, ()=> Appplication);
+
 
 const styles = StyleSheet.create({ 
   map: {
