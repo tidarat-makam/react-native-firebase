@@ -38,6 +38,22 @@ const store = createStore(reducer)
 const regularJobKey = "regularJobKey";
 const exactJobKey = "exactJobKey";
 
+
+
+const backgroundJob = {
+  jobKey: exactJobKey,
+  job: () => {
+    console.log("Run BackgroundJob")
+
+    console.log(store.getState())
+    // firebase.database().ref('Device1/Location/').on ('value', function (snapshot) {
+    //   console.log("Location : ",snapshot.val())
+      
+    // }.bind(this));
+  }
+};
+
+BackgroundJob.register(backgroundJob);
 // const backgroundJob = {
 //   jobKey: "regularJobKey",
 //   period: 1000,
@@ -51,22 +67,6 @@ const exactJobKey = "exactJobKey";
 
 //   }
 // };
-
-const backgroundJob = {
-  jobKey: exactJobKey,
-  job: () => {
-    console.log("Run BackgroundJob")
-
-    console.log(store.getState(LocationFirst))
-    // firebase.database().ref('Device1/Location/').on ('value', function (snapshot) {
-    //   console.log("Location : ",snapshot.val())
-      
-    // }.bind(this));
-  }
-};
-
-BackgroundJob.register(backgroundJob);
-
 class Appplication extends Component {
 
   constructor(props) {
