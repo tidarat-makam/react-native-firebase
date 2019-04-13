@@ -56,22 +56,42 @@ const locationReducer = (state = locaState, action) => {
 }
 const storeLoca = createStore(locationReducer)
 
+const gyroSensor = (state = {gyroStatus: 0}, action) => {
+  switch (action.type) {
+    case "SET_GYRO":
+      state={
+        gyroStatus: state.gyroStatus = action.payloadGyro
+      }
+      break; 
+  }
+  return state
+}
+const storeGyro = createStore(gyroSensor)
+
 const backgroundJob = {
   jobKey: "exactJobKey",
   job: () => {
      const sSW = JSON.parse(JSON.stringify(store.getState())).statusSwitch;
-    
-    //  console.log(long1) 
+     const gyroFrist= JSON.parse(JSON.stringify(storeGyro.getState())).gyroStatus ; 
+
     if(sSW == 1){
       console.log("Run Background job")
+      console.log("------------------- :"+gyroFrist)
       firebase.database().ref('Device1/Location/').on ('value', function (snapshot) {
         // console.log("Location : ",snapshot.val())
         lat2 = snapshot.val().lat
         long2 = snapshot.val().long
       }.bind(this));
+      
+      firebase.database().ref('Device1/GyroSensor').on('value', function (snapshot) {
+        gyro = snapshot.val()
+        console.log("gyro" + gyro)
+      }.bind(this));
+
     }else{
       BackgroundJob.cancelAll();
     }
+
     const lat1 = JSON.parse(JSON.stringify(storeLoca.getState())).LocationFirst.latLocation;
     const long1 = JSON.parse(JSON.stringify(storeLoca.getState())).LocationFirst.longLocation; 
     // Distance Map
@@ -84,6 +104,14 @@ const backgroundJob = {
 // Check Distance Notification
     if(dis > 15){
       console.log("sos")
+      alert("title", "message")
+    }
+
+    // CHeck Gyro
+    const ChGyro = (gyroFrist) - (gyro);
+    // const ChGyro = -1200
+    if( (ChGyro => 1000) || (ChGyro <= -1000)){
+      console.log("sos gyro")
       alert("title", "message")
     }
   }
@@ -107,7 +135,8 @@ class Appplication extends Component {
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       },
-      switchValue: false   
+      switchValue: false,
+      Buzzer: 0   
     };
   }
   componentDidMount() {
@@ -121,8 +150,6 @@ class Appplication extends Component {
 
   // connect fierbase
   componentWillMount() {
-    console.log("Hello in componentWillMount");
-
     const firebaseConfig = {
     apiKey: "AIzaSyBeOrf_e8MWHGufnwmtcI52Wzo3Ds19H2I",
     authDomain: "testprojecttct2ra.firebaseapp.com",
@@ -131,14 +158,16 @@ class Appplication extends Component {
     storageBucket: "testprojecttct2ra.appspot.com",
     messagingSenderId: "188951092399"
     };
-    // firebase.initializeApp(firebaseConfig);
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
+
+       console.log("connected firebase!!!")
   }  
-    // console.log(firebase)
-    console.log("connected firebase!!!")
+
+   
     firebase.database().ref('Device1/Location/').on('value', function (snapshot) {
       console.log("Location : ",snapshot.val())
+      console.log("Firebase Location successful!!!")
       this.setState({
         region: {
           latitude: snapshot.val().lat,
@@ -157,21 +186,41 @@ class Appplication extends Component {
   }
   
     onBuzzer() {
-      firebase.database().ref('Device1/').update({
-        StatusAlarm: 1
-      }).then(() => {
-        console.log('Buzzer 1 !');
-      }).catch((error) => {
-        console.log("error is null");
-        console.log(error);
-      });
+      if(this.state.Buzzer == 0){
+        firebase.database().ref('Device1/').update({
+                StatusAlarm: 1
+              }).then(() => {
+                console.log('sent status Buzzer: 1 successful');
+                console.log('Status Buzzer: Turn on');
+                console.log('-------------------------');
+                this.setState({ Buzzer: 1});
+              }).catch((error) => {
+                console.log("error is null");
+                console.log(error);
+        });
+      }else if(this.state.Buzzer == 1){
+        firebase.database().ref('Device1/').update({
+          StatusAlarm: 0
+        }).then(() => {
+          console.log('sent status Buzzer: 0 successful');
+          console.log('Status Buzzer: Turn off');
+          console.log('-------------------------');
+          this.setState({ Buzzer: 0});
+        }).catch((error) => {
+          console.log("error is null");
+          console.log(error);
+        });
+      }
+      
   }
     
     switchEngine() {
       firebase.database().ref('Device1/').update({
         StatusMotor: 0
       }).then(() => {
-        console.log('switchEngine 0 !');
+        console.log('sent status StatusMotor 0 successful!');
+        console.log('Trun off ');
+        console.log('-------------------------------------');
       }).catch((error) => {
         console.log("error is null");
         console.log(error);
@@ -194,15 +243,28 @@ class Appplication extends Component {
           })
          }.bind(this));
 
+         firebase.database().ref('Device1/GyroSensor').once('value', function (snapshot) {
+          console.log("GyroSensor: ",snapshot.val())
+            storeGyro.dispatch({
+              type: "SET_GYRO",
+              payloadGyro: snapshot.val()
+            })
+           }.bind(this));
+
         firebase.database().ref('Device1/').update({
           StatusAPP: 1
         }).then(() => {
-          console.log('StatusAPP 1 !');
+          console.log('sent StatusAPP 1 successful!');
+          console.log('The application is running.');
         }).catch((error) => {
           console.log("error is null");
           console.log(error);
         });      
       }else{
+        storeGyro.dispatch({
+          type: "SET_GYRO",
+          payloadGyro: 0
+        })
         store.dispatch({
           type: "SET_SWTCH",
           count: 0
@@ -215,7 +277,8 @@ class Appplication extends Component {
         firebase.database().ref('Device1/').update({
           StatusAPP: 0
         }).then(() => {
-          console.log('StatusAPP 0 !');
+          console.log('sent StatusAPP 0 successful!');
+          console.log('close application.');
         }).catch((error) => {
           console.log("error is null");
           console.log(error);
@@ -227,6 +290,9 @@ class Appplication extends Component {
 
    call() {
     Linking.openURL(`tel:${1192}`)
+    console.log('----------');
+    console.log('Call 1192!');
+    console.log('----------');
    }
  
   chang() {
@@ -259,7 +325,9 @@ class Appplication extends Component {
                           <Button onPress={() => this.chackLococation()}  title="chack location " accessibilityLabel="ตรวจสอบตำแหน่ง"/></View>   */}
                     <View style={{ flexDirection: 'row', flexGrow: 0.08, }}>
                       <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30, marginBottom: 10 }}>
-                          <Button color='#4ca2d0' onPress={() => this.onBuzzer()}  title="Buzzer " accessibilityLabel="้เปิดเสียงสำโพง"/></View>   
+                          <Button color='#4ca2d0' onPress={() => this.onBuzzer()}  
+                          title="Buzzer" 
+                          accessibilityLabel="้เปิดเสียงสำโพง"/></View>   
                       <View style={{ width: (Dimensions.get('window').width)/3, }}>
                           <Button color='#4ca2d0' onPress={() => this.switchEngine()}  title="Engine" accessibilityLabel="ดับเครื่องยนต์"/></View>
                     </View>
