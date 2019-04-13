@@ -180,8 +180,6 @@ class Appplication extends Component {
 
  toggleSwitch = (value) => {
       this.setState({switchValue: value})
-      // console.log("Switch");
-      // console.log("chkSW" + chkSW);
       if((JSON.parse(JSON.stringify(store.getState())).statusSwitch) == 0){
         store.dispatch({
                 type: "SET_SWTCH",
@@ -194,7 +192,16 @@ class Appplication extends Component {
             payloadLat: snapshot.val().lat,
             payloadLong: snapshot.val().long
           })
-         }.bind(this));       
+         }.bind(this));
+
+        firebase.database().ref('Device1/').update({
+          StatusAPP: 1
+        }).then(() => {
+          console.log('StatusAPP 1 !');
+        }).catch((error) => {
+          console.log("error is null");
+          console.log(error);
+        });      
       }else{
         store.dispatch({
           type: "SET_SWTCH",
@@ -205,6 +212,14 @@ class Appplication extends Component {
           payloadLat: 0,
           payloadLong: 0
         })
+        firebase.database().ref('Device1/').update({
+          StatusAPP: 0
+        }).then(() => {
+          console.log('StatusAPP 0 !');
+        }).catch((error) => {
+          console.log("error is null");
+          console.log(error);
+        });  
       }     
       console.log(store.getState())
       console.log(storeLoca.getState())
