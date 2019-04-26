@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import {AppRegistry, Text, View, StyleSheet, Dimensions, Button, onPressLearnMore, Linking, TouchableHighlight } from 'react-native'; 
+import {AppRegistry, View, StyleSheet, Dimensions, Button, onPressLearnMore, Linking } from 'react-native'; 
 
 import { name as AppName } from './app.json';
 
