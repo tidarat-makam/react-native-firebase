@@ -142,8 +142,8 @@ class Appplication extends Component {
   componentDidMount() {
     BackgroundJob.schedule({
       jobKey: "exactJobKey",
-      period: 85000,
-      timeout: 85000,
+      period: 1000,
+      timeout: 10000,
       exact: true
     });  
   }
@@ -321,6 +321,8 @@ class Appplication extends Component {
                 </View>
 
                 <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center'}}>
+                  {/* <View style={{ width: (Dimensions.get('window').width)/2, height: 25,flexGrow: 0.2  }}>
+                          <Button onPress={() => this.chackLococation()}  title="chack location " accessibilityLabel="ตรวจสอบตำแหน่ง"/></View>   */}
                     <View style={{ flexDirection: 'row', flexGrow: 0.08, }}>
                       <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30, marginBottom: 10 }}>
                           <Button color='#4ca2d0' onPress={() => this.onBuzzer()}  
@@ -329,9 +331,9 @@ class Appplication extends Component {
                       <View style={{ width: (Dimensions.get('window').width)/3, }}>
                           <Button color='#4ca2d0' onPress={() => this.switchEngine()}  title="Engine" accessibilityLabel="ดับเครื่องยนต์"/></View>
                     </View>
-                    <View style={{ flexDirection: 'row'}}>
+                    <View style={{ flexDirection: 'row', }}>
                       <View style={{ width: (Dimensions.get('window').width)/3, marginRight :30 }}>
-                          <Button color='#4ca2d0' onPress={ () => this.call()}  title="call 1192" accessibilityLabel="โทรแจ้ง 1192" /></View>   
+                          <Button color='#4ca2d0' onPress={ () => this.call()}  title="call 1192" accessibilityLabel="โทรแจ้ง 1192"/></View>   
                       <View style={{ width: (Dimensions.get('window').width)/3, }}>
                           <Button color='#4ca2d0' onPress={onPressLearnMore}  title="Off Alert" accessibilityLabel="ไม่สนใจ"/></View>
                     </View>
