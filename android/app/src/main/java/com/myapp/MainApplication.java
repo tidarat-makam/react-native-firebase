@@ -3,9 +3,6 @@ package com.myapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-
-import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
-
 import com.pilloxa.backgroundjob.BackgroundJobPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import com.facebook.react.ReactNativeHost;
@@ -29,7 +26,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new ReactNativePushNotificationPackage(),
             new BackgroundJobPackage(),
             new RNFirebasePackage(),
               new MapsPackage()
