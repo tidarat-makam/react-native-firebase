@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "188951092399",
+    "firebase_url": "https://testprojecttct2ra.firebaseio.com",
+    "project_id": "testprojecttct2ra",
+    "storage_bucket": "testprojecttct2ra.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:188951092399:android:c178a96f49a6d439",
+        "android_client_info": {
+          "package_name": "app.CycleTrack"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "188951092399-9s62411cujgf0hr0h6bol7fmih4kvn5h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCB9eZLRSZedom6X9NRTcrKAybP1KQT1PU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "188951092399-9s62411cujgf0hr0h6bol7fmih4kvn5h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:188951092399:android:1d998300551a0981",
+        "android_client_info": {
+          "package_name": "com.myapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "188951092399-9s62411cujgf0hr0h6bol7fmih4kvn5h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCB9eZLRSZedom6X9NRTcrKAybP1KQT1PU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "188951092399-9s62411cujgf0hr0h6bol7fmih4kvn5h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
