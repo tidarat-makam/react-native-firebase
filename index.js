@@ -149,16 +149,32 @@ class Appplication extends Component {
     }
     
     switchEngine() {
-      firebase.database().ref('Device1/').update({
-        StatusMotor: 0
-      }).then(() => {
-        console.log('sent status StatusMotor 0 successful!');
-        console.log('Trun off ');
-        console.log('-------------------------------------');
-      }).catch((error) => {
-        console.log("error is null");
-        console.log(error);
-      });
+      if(this.state.power == 0){
+        firebase.database().ref('Device1/').update({
+          StatusMotor: 1
+        }).then(() => {
+          this.setState({ power: 1});
+          console.log('sent status power: 1 successful');
+          console.log('Status power: Turn on');
+          console.log('-------------------------');
+        }).catch((error) => {
+          console.log("error is null");
+          console.log(error);
+        });
+      }else if(this.state.power == 1){
+        firebase.database().ref('Device1/').update({
+          StatusMotor: 0
+        }).then(() => {
+          this.setState({ power: 0});
+          console.log('sent status power: 0 successful');
+          console.log('Status power: Turn off');
+          console.log('-------------------------');
+        }).catch((error) => {
+          console.log("error is null");
+          console.log(error);
+        });
+      }    
+
     }
 
  toggleSwitch = (value) => {
@@ -171,7 +187,7 @@ class Appplication extends Component {
 
       firebase.database().ref('Device1/').update({
         StatusAPP: 1,
-        cheack_lo: "trun"
+        cheack_lo: "true"
       }).then(() => {
         console.log('sent StatusAPP 1 successful!');
         console.log('The application is running.');
