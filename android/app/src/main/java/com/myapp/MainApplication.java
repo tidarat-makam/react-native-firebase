@@ -5,6 +5,7 @@ import android.app.Application;
 import com.facebook.react.ReactApplication;
 import com.pilloxa.backgroundjob.BackgroundJobPackage;
 import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -29,6 +30,7 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
             new BackgroundJobPackage(),
             new RNFirebasePackage(),
+            new RNFirebaseDatabasePackage(),
               new RNFirebaseMessagingPackage(),
               new MapsPackage()
       );
